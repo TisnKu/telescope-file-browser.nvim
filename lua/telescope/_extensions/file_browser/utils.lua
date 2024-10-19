@@ -201,24 +201,15 @@ end
 
 -- if exact_match is true, then path1 and path2 must be the same. Otherwise, one path must contain the other
 fb_utils.compare_paths = function(path1, path2, exact_match)
-  -- separate path segments with all os separators, then compare length and each segment
-  local path1_segments = vim.split(path1:gsub("[/\\]", os_sep), os_sep)
-  local path2_segments = vim.split(path2:gsub("[/\\]", os_sep), os_sep)
-  if exact_match and #path1_segments ~= #path2_segments then
-    return false
+  local path1 = path1:gsub("[/\\]", os_sep)
+  local path2 = path2:gsub("[/\\]", os_sep)
+  print('path1: ' .. path1)
+  print('path2: ' .. path2)
+  if exact_match then
+    return path1 == path2
   end
 
-  if #path1_segments > #path2_segments then
-    path1_segments, path2_segments = path2_segments, path1_segments
-  end
-
-  for i, segment in ipairs(path1_segments) do
-    if segment ~= path2_segments[i] then
-      return false
-    end
-  end
-
-  return true
+  return path1:find(path2, 1, true) or path2:find(path1, 1, true)
 end
 
 local _get_selection_index = function(path, dir, results)
