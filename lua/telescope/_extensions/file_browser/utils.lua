@@ -199,12 +199,32 @@ fb_utils.sanitize_path_str = function(path)
   return (path:gsub("(.)/$", "%1"))
 end
 
+-- if exact_match is true, then path1 and path2 must be the same. Otherwise, one path must contain the other
+fb_utils.compare_paths = function(path1, path2, exact_match)
+  -- separate path segments with all os separators, then compare length and each segment
+  local path1_segments = vim.split(path1:gsub("[/\\]", os_sep), os_sep)
+  local path2_segments = vim.split(path2:gsub("[/\\]", os_sep), os_sep)
+  if exact_match and #path1_segments ~= #path2_segments then
+    return false
+  end
+
+  if #path1_segments > #path2_segments then
+    path1_segments, path2_segments = path2_segments, path1_segments
+  end
+
+  for i, segment in ipairs(path1_segments) do
+    if segment ~= path2_segments[i] then
+      return false
+    end
+  end
+
+  return true
+end
+
 local _get_selection_index = function(path, dir, results)
-  local path_dir = Path:new(path):parent():absolute()
-  path = fb_utils.sanitize_path_str(path)
-  if dir == path_dir then
+  if fb_utils.compare_paths(dir, path, false) then
     for i, path_entry in ipairs(results) do
-      if fb_utils.sanitize_path_str(path_entry.value) == path then
+      if fb_utils.compare_paths(path_entry.value, path, true) then
         return i
       end
     end
