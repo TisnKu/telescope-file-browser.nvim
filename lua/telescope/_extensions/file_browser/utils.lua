@@ -203,8 +203,6 @@ end
 fb_utils.compare_paths = function(path1, path2, exact_match)
   local path1 = path1:gsub("[/\\]", os_sep)
   local path2 = path2:gsub("[/\\]", os_sep)
-  print('path1: ' .. path1)
-  print('path2: ' .. path2)
   if exact_match then
     return path1 == path2
   end
